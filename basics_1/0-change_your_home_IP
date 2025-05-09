@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
-# Script that changes localhost to 127.0.0.2 and facebook.com to 8.8.8.8 in /etc/hosts
+# Configures localhost and facebook.com IPs in /etc/hosts
 
 set -e
 
-# Backup the original hosts file
-sudo cp /etc/hosts /etc/hosts.bak
+HOSTS_FILE="/etc/hosts"
 
-# Remove existing localhost and facebook.com entries
-tmpfile="$(mktemp)"
-grep -v -E 'localhost|facebook\.com' /etc/hosts > "$tmpfile"
+# Remove existing localhost and facebook.com lines
+sudo sed -i '/[[:space:]]localhost$/d' "$HOSTS_FILE"
+sudo sed -i '/[[:space:]]facebook\.com$/d' "$HOSTS_FILE"
 
-# Add the required entries
-{
-    echo "127.0.0.2	localhost"
-    echo "8.8.8.8	facebook.com"
-} >> "$tmpfile"
-
-# Overwrite the hosts file
-sudo tee /etc/hosts < "$tmpfile" > /dev/null
-rm "$tmpfile"
+# Add new entries
+echo "127.0.0.2 localhost" | sudo tee -a "$HOSTS_FILE" > /dev/null
+echo "8.8.8.8 facebook.com" | sudo tee -a "$HOSTS_FILE" > /dev/null
